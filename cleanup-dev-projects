@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Arguments:
+#   <dir_name>: Path to the directory to empty, relative to the directory containing <project_file>.
+#   <project_file>...: File indicating a project should be cleaned up.
+cleanup_dir() {
+  local dir_name="${1}";
+  shift;
+  local files=("${@}");
+  for f in "${files[@]}"; do
+    local dir;
+    dir="$(dirname "${f}")/${dir_name}";
+
+    [[ -d "${dir:?}" ]] || continue;
+    if [[ -n "$(find "${dir:?}" -type f ! -name ".DS_Store" -mtime -90)" ]]; then
+      echo "<${dir}> has files modified in the last 3 months, skipping cleanup";
+      continue;
+    fi
+
+    echo "Deleting <${dir}>…" 1>&2;
+    rm -rf "${dir:?}";
+  done
+}
+
+echo 'Cleaning up Rust projects…'
+cleanup_dir 'target' $(find . -type f -name 'Cargo.toml')
+
+echo 'Cleaning up Swift projects…'
+cleanup_dir '.build' $(find . -type f -name 'Package.swift')
+cleanup_dir 'Pods' $(find . -type f \( -name 'Podfile' -o -name 'Podfile.lock' \))
+
+echo 'Cleaning up JavaScript projects…'
+cleanup_dir 'node_modules' $(find . -type f \( -name 'package.json' -o -name 'package-lock.json' \) -not -path '*/node_modules/*')
