@@ -1,0 +1,49 @@
+#!/bin/bash
+
+delete() {
+  local dir="${1}";
+  [[ -d "${dir}" ]] || return 0;
+  du -sh "${dir}";
+  rm -rf "${dir}";
+}
+
+# Clean Xcode cache (≈10GB)
+delete ~/Library/Developer/Xcode/DerivedData/
+
+# Clean Spotify cache (≈2GB)
+delete ~/Library/Caches/com.spotify.client/
+
+# Clean Maven cache (≈3GB)
+# https://www.baeldung.com/maven-clear-cache
+# In a project
+#mvn dependency:purge-local-repository -DactTransitively=false -DreResolve=false
+# Anywhere
+delete ~/.m2/repository/
+delete ~/Library/Caches/Coursier/v1/
+
+# Cleanup brew (≈1GB)
+brew cleanup
+brew autoremove
+#delete ~/Library/Caches/Homebrew/downloads/
+
+# Cleanup SwiftPM (≈1GB)
+# In a project
+#swift package purge-cache
+#swift package purge-clean
+# Anywhere
+delete ~/Library/Caches/org.swift.swiftpm/
+
+# Delete CodeWithMe (≈1GB)
+delete ~/Library/Caches/JetBrains/CodeWithMeClientDist/
+
+# Delete Firefox updates (≈500MB)
+delete ~/Library/Caches/Mozilla/updates/
+
+# NLTK data (≈60MB)
+delete ~/nltk_data/
+
+# Manual deletes
+# iOS runtimes (delete all but the newest) (≈30GB)
+open ~/Library/Developer/Xcode/iOS\ DeviceSupport
+# Simulator devics (≈20GB)
+open ~/Library/Developer/Xcode/UserData/Previews
