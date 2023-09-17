@@ -4,7 +4,7 @@ delete() {
   local dir="${1}";
   [[ -d "${dir}" ]] || return 0;
   du -sh "${dir}";
-  rm -rf "${dir}";
+  [[ -z "${DRY_RUN}" ]] && rm -rf "${dir}";
 }
 
 # Clean Xcode cache (≈10GB)
